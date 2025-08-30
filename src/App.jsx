@@ -1,14 +1,13 @@
-import { useState } from 'react'
-import { Children } from 'react';
+import { useState, Children } from 'react'
 import { Icon, Plus, ChevronDown, Minimize2, Trash} from 'lucide-react';
 import { coconut } from '@lucide/lab';
+import resumeApp from './data';
 import './App.css'
 
 export function App(){
   console.log("app component called")
   return (
     <>
-      <Icon iconNode={coconut} size={48} color="white" />
       <CardCollapse header={'Personal Details'}>
         <PersonalDetailsBlock></PersonalDetailsBlock>
         <AddBtn action={""} info={"Links"}></AddBtn>
@@ -45,13 +44,34 @@ function JobBtn( {action} ){
   )
 }
 
-function MedIconBtn( {action, jsxIcon: Icon} ){
+function MedIconBtn( {action, jsxIcon: Icon, destructive=false} ){
+  let classStyle = 'med-icon-btn';
+  if(destructive){
+    classStyle = 'med-icon-btn destruct-hover';
+  }
+
   return(
-    <div className='med-icon-btn'>
+    <div className={classStyle} onClick={action}>
       <Icon
       size={20} 
       color='#333232'
-      onClick={action}></Icon>
+      ></Icon>
+    </div>
+  )
+}
+
+function SmallIconBtn( {action, jsxIcon: Icon, destructive=false} ){
+  let classStyle = 'small-icon-btn';
+  if(destructive){
+    classStyle = 'small-icon-btn destruct-hover';
+  }
+
+  return(
+    <div className={classStyle} onClick={action}>
+      <Icon
+      size={16}
+      color='#333232'
+      ></Icon>
     </div>
   )
 }
@@ -105,11 +125,14 @@ function MainInput( {label, type} ){
   )
 }
 
-function TextAreaInput( {label} ){
+function TextAreaInput( {label, deleteAction} ){
   return(
     <div className="input-container">
       <label>
+      <div className='space-between-container'>
       {label}
+      <SmallIconBtn action={deleteAction} jsxIcon={Trash} destructive={true}></SmallIconBtn>
+      </div>  
       <textarea className='input-text-area' resize='none'></textarea>
       </label>
     </div>
@@ -139,7 +162,7 @@ function EducationBlock( {removal} ){
         <h4>Education test</h4>
         <div className="block-action-container">
           <MedIconBtn action={handleMinimize} jsxIcon={Minimize2}></MedIconBtn>
-          <MedIconBtn action={removal} jsxIcon={Trash}></MedIconBtn>
+          <MedIconBtn action={removal} jsxIcon={Trash} destructive={true}></MedIconBtn>
         </div>
       </div>  
         {!isMinimized && (
@@ -169,7 +192,7 @@ function ExperienceBlock( {removal} ){
         <h4>Experience test</h4>
         <div className="block-action-container">
           <MedIconBtn action={handleMinimize} jsxIcon={Minimize2}></MedIconBtn>
-          <MedIconBtn action={removal} jsxIcon={Trash}></MedIconBtn>
+          <MedIconBtn action={removal} jsxIcon={Trash} destructive={true}></MedIconBtn>
         </div>
       </div>  
         {!isMinimized && (

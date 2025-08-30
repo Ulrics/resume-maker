@@ -1,5 +1,3 @@
-
-
 class Resume{
     constructor(){
         this.name ="";
@@ -26,7 +24,7 @@ class Resume{
         this.educationList.splice(index, 1);
     }
 
-    removeEducation(id){
+    removeExperience(id){
         const isId = (element) => element.id === id;
         const index = this.experienceList.findIndex(isId);
         this.experienceList.splice(index, 1);
@@ -51,8 +49,33 @@ class Experience{
         this.location="";
         this.startDate="";
         this.endDate="";
-        this.jobPoints=[""];
+        this.jobPoints=[];
 
         this.id=crypto.randomUUID();
     }
+
+    addJobPoint(){
+        const newPoint = new jobPoint();
+        this.jobPoints.push(newPoint);
+    }
+
+    removeJobPoint(id){
+        const isId = (element) => element.id === id;
+        const index = this.jobPoints.findIndex(isId);
+        this.jobPoints.splice(index, 1);
+    }
 }
+
+class jobPoint{
+    constructor(){
+        this.point="";
+        this.id=crypto.randomUUID();
+    }
+}
+
+const resumeApp = new Resume();
+resumeApp.addEducation();
+resumeApp.addExperience();
+resumeApp.experienceList[0].addJobPoint();
+
+export default resumeApp;

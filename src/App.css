@@ -6,6 +6,7 @@
   --primary-hover: #4AC8EB;
   --grey: #F5F5F5;
   --grey-hover: #EDEDED;
+  --hover-destruction: #FFD5D5;
 
   --bdr-grey: rgb(154, 154, 154, 0.25);
   --bdr-input: rgb(137, 137, 137, 0.35);
@@ -32,7 +33,7 @@
   justify-content: center;
   align-items: center;
   gap: 8px;
-  margin-top: 16px;
+  margin-top: 8px;
 }
 
 .secondary-add-btn{
@@ -109,6 +110,7 @@ h4{
   width: 100%;
   font: 400 1rem/1.5rem 'Manrope';
   box-sizing: border-box;
+  margin-top: 4px;
 }
 
 .input-text-area{
@@ -120,6 +122,7 @@ h4{
   font: 400 1rem/1.5rem 'Manrope';
   box-sizing: border-box;
   resize: none; 
+  margin-top: 4px;
 }
 
 .info-block{
@@ -147,13 +150,36 @@ label{
   flex-direction: center;
   align-items: center;
   border-radius: 6px;
-  width: 28px;
   box-sizing: border-box;
 }
+
+.small-icon-btn{
+  padding: 4px;
+  display: flex;
+  flex-direction: center;
+  align-items: center;
+  border-radius: 4px;
+  width: 24px;
+  box-sizing: border-box;
+}
+
 
 .med-icon-btn:hover{
   background-color: var(--hover-grey);
   cursor: pointer;
+}
+
+.small-icon-btn:hover{
+  background-color: var(--hover-grey);
+  cursor: pointer;
+}
+
+.med-icon-btn.destruct-hover:hover {
+  background-color: var(--hover-destruction);
+}
+
+.small-icon-btn.destruct-hover:hover {
+  background-color: var(--hover-destruction);
 }
 
 .block-action-container{
@@ -164,4 +190,11 @@ label{
 .start-end-date{
   display: flex;
   gap: 16px;
+}
+
+.space-between-container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
