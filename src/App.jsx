@@ -3,9 +3,41 @@ import { Icon, Plus, ChevronDown, Minimize2, Trash} from 'lucide-react';
 import { Education, Experience, ContactLink, JobPoint, resumeApp } from './data';
 import './App.css'
 
-export function ResumeInputs(){
+export function App(){
   const [resume, setResume] = useState(resumeApp);
-  
+
+  return(
+    <div>
+      <div>
+        <ResumeInputs resume={resume} setResume={setResume}/>
+      </div>
+      <div>
+        <ResumePreview resume={resume}/>
+      </div>
+    </div>
+  )
+
+}
+
+function ResumePreview( {resume} ){
+  function generateExperience(obj){
+    return obj.experienceList.map((experience) => (
+      <ResumeExperiencePoint obj={experience}/>
+    ))
+  }
+
+  return (
+    <div className='resume-preview'>
+      <div>
+        <SectionHeader header={"Experience"}/>
+        {generateExperience(resume)}
+      </div>
+      <SectionHeader header={"Education"}/>
+    </div>
+  )
+}
+
+function ResumeInputs( {resume, setResume} ){
   function handleAdd(list, classObj){
     setResume(prev => ({
       ...prev, 
@@ -315,7 +347,7 @@ function ExperienceBlock( { obj, onEdit, removal, addJobPoint, removeJobPoint } 
   return(
     <div className="info-block">
       <div className='card-header-container'>
-        <h4>{obj.title || "New Experience"}</h4>
+        <h4>{obj.company || "New Experience"}</h4>
         <div className="block-action-container">
           <MedIconBtn action={handleMinimize} jsxIcon={Minimize2}/>
           <MedIconBtn action={removal} jsxIcon={Trash} destructive={true}/>
@@ -323,10 +355,10 @@ function ExperienceBlock( { obj, onEdit, removal, addJobPoint, removeJobPoint } 
       </div>  
         {!isMinimized && (
           <div className='input-block'>
-            <MainInput label={'Job Title'} type={'text'} name={'title'} 
-              value={obj.title} onChange={handleChange}/>
             <MainInput label={'Company Name'} type={'text'} name={'company'} 
               value={obj.company} onChange={handleChange}/>
+            <MainInput label={'Job Title'} type={'text'} name={'title'} 
+              value={obj.title} onChange={handleChange}/>
             <MainInput label={'Location'} type={'text'} name={'location'} 
               value={obj.location} onChange={handleChange}/>
             <div className='start-end-date'>
@@ -339,6 +371,39 @@ function ExperienceBlock( { obj, onEdit, removal, addJobPoint, removeJobPoint } 
             <JobBtn action={() => addJobPoint(obj.id)}/>
           </div>
         )}
+    </div>
+  )
+}
+
+function SectionHeader( {header} ){
+  return(
+    <div>
+      <h3>{header}</h3>
+      <div className='divider'/>
+    </div>
+  )
+}
+
+function ResumeExperiencePoint( {obj} ){
+  function generateJobPoints(jobObj){
+    return jobObj.jobPoints.map((jobPoint) => (
+      <li>{jobPoint.point}</li>
+    ))
+  }
+
+  return(
+    <div>
+      <div>
+        <h4>{obj.title}</h4>
+        <h4>{`${obj.startDate} - ${obj.endDate}`}</h4>
+      </div>
+      <div>
+        <h5>{obj.company}</h5>
+        <p>{`- ${obj.location}`}</p>
+      </div>
+      <ul>
+        {generateJobPoints(obj)}
+      </ul>
     </div>
   )
 }
