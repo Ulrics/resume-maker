@@ -1,37 +1,119 @@
 import { useState, Children } from 'react'
 import { Icon, Plus, ChevronDown, Minimize2, Trash} from 'lucide-react';
-import { coconut } from '@lucide/lab';
-import resumeApp from './data';
+import { Resume, Education, Experience, ContactLink, resumeApp } from './data';
 import './App.css'
 
 export function App(){
-  console.log("app component called")
+  const [resume, setResume] = useState(resumeApp);
+
+  function handleAddEducation(){
+    setResume(prev => ({
+      ...prev, 
+      educationList: [...prev.educationList, new Education()]
+    }));
+  }
+
+  function handleRemoveEducation(obj){
+    setResume(prev => ({
+      ...prev, 
+      educationList: prev.educationList.filter(e => e.id !== obj.id)
+    }))
+  }
+
+  function generateEducationBlock(){
+    return resume.educationList.map((edu) => (
+      <EducationBlock 
+        key={edu.id} 
+        obj={edu} 
+        onEdit={(updated) => handleEditEducation(edu.id, updated)} 
+        removal={() => handleRemoveEducation(edu)}/>
+    ))
+  }
+
+  function handleEditEducation(id, updated){
+    setResume(prev => ({
+      ...prev, 
+      educationList: prev.educationList.map(e =>
+        e.id === id ? { ...e, ...updated } : e
+      )
+    }));
+  }
+
+  function generateExperienceBlock(){
+    return resume.experienceList.map((ex) => (
+      <ExperienceBlock
+        key={ex.id}
+        obj={ex}
+        onEdit={""}
+        removal={""}
+      />
+    ))
+  }
+
+  function handleAddLink(){
+    setResume(prev => ({
+      ...prev, 
+      links: [...prev.links, new ContactLink()]
+    }));
+  }
+
+  function handleRemoveLink(obj){
+    setResume(prev => ({
+      ...prev, 
+      links: prev.links.filter(e => e.id !== obj.id)
+    }))
+  }
+
+  function handleEditLink(id, updated){
+    setResume(prev => ({
+      ...prev, 
+      links: prev.links.map(e =>
+        e.id === id ? { ...e, ...updated } : e
+      )
+    }));
+  }
+
+  function generateLinks(){
+    return resume.links.map((link, index) => (
+      <DeleteInput 
+        key={link.id} 
+        obj={link} 
+        label={`link ${index + 1}`}
+        onEdit={(updated) => handleEditLink(link.id, updated)} 
+        deleteAction={() => handleRemoveLink(link)}/>
+    ))
+  }
+
   return (
     <>
       <CardCollapse header={'Personal Details'}>
-        <PersonalDetailsBlock></PersonalDetailsBlock>
-        <AddBtn action={""} info={"Links"}></AddBtn>
+        <PersonalDetailsBlock>
+          {generateLinks()}
+        </PersonalDetailsBlock> 
+        <AddBtn action={handleAddLink} info={"Links"}/>
       </CardCollapse>
       <CardCollapse header={'Education'}>
-        <EducationBlock></EducationBlock>
-        <AddBtn action={""} info={"Education"}></AddBtn>
+        {generateEducationBlock()}
+        <AddBtn action={handleAddEducation} info={"Education"} resume={resume}/>
       </CardCollapse>
        <CardCollapse header={'Experience'}>
-        <ExperienceBlock></ExperienceBlock>
-        <AddBtn action={""} info={"Experience"}></AddBtn>
+        {generateExperienceBlock()}
+        <AddBtn action={() => resumeApp.addExperience()} info={"Experience"}/>
       </CardCollapse>
     </>
   )
 }
 
-function AddBtn( {action, info} ){
-  return(<button 
-    className="primary-add-btn"
-    onClick={action}>
-    <Plus size={24} color='#333232'></Plus>
-    Add {info}
-  </button>
-  )
+function AddBtn({ action, info }) {
+  return (
+    <button 
+      className="primary-add-btn"
+      onClick={action}
+    >
+      <Plus size={24} color='#333232' />
+      Add {info}
+    </button>
+  );
 }
 
 function JobBtn( {action} ){
@@ -125,13 +207,32 @@ function MainInput( {label, type} ){
   )
 }
 
+function DeleteInput( {label, obj, onEdit, deleteAction} ){
+  return(
+    <div className="input-container">
+      <label>
+        <div className='space-between-container'>
+          {label} 
+          <SmallIconBtn action={deleteAction} jsxIcon={Trash} destructive={true}></SmallIconBtn>
+        </div>
+        <input 
+          className='input-main' 
+          type='text' 
+          name='label' 
+          value={obj.link} 
+          onChange={(e) => onEdit({ link: e.target.value })} />
+      </label>
+    </div>
+  )
+}
+
 function TextAreaInput( {label, deleteAction} ){
   return(
     <div className="input-container">
       <label>
       <div className='space-between-container'>
-      {label}
-      <SmallIconBtn action={deleteAction} jsxIcon={Trash} destructive={true}></SmallIconBtn>
+        {label}
+        <SmallIconBtn action={deleteAction} jsxIcon={Trash} destructive={true}></SmallIconBtn>
       </div>  
       <textarea className='input-text-area' resize='none'></textarea>
       </label>
@@ -139,27 +240,33 @@ function TextAreaInput( {label, deleteAction} ){
   )
 }
 
-function PersonalDetailsBlock( {} ){
+function PersonalDetailsBlock( {children} ){
   return(
     <div className="info-block">
       <MainInput label={'Name'} type={'text'}></MainInput>
       <MainInput label={'Email'} type={'email'}></MainInput>
       <MainInput label={'Phone Number'} type={'text'}></MainInput>
+      {children}
     </div>
   )
 }
 
-function EducationBlock( {removal} ){
+function EducationBlock( { obj, onEdit, removal } ){
   const [isMinimized, setMinimized] = useState(false);
 
   function handleMinimize(){
     setMinimized(!isMinimized);
   }
 
+  function handleChange(event){
+    const { name, value } = event.target;
+    onEdit({ [name]: value });
+  }
+
   return(
     <div className="info-block">
       <div className='card-header-container'>
-        <h4>Education test</h4>
+        <h4>{obj.title || "New Education"}</h4>
         <div className="block-action-container">
           <MedIconBtn action={handleMinimize} jsxIcon={Minimize2}></MedIconBtn>
           <MedIconBtn action={removal} jsxIcon={Trash} destructive={true}></MedIconBtn>
@@ -167,11 +274,15 @@ function EducationBlock( {removal} ){
       </div>  
         {!isMinimized && (
           <div className='input-block'>
-            <MainInput label={'School Name'} type={'text'}></MainInput>
-            <MainInput label={'Diploma'} type={'text'}></MainInput>
+            <MainInput label={'School Name'} type={'text'} name={"school"} 
+              value={obj.school} onChange={handleChange}></MainInput>
+            <MainInput label={'Diploma'} type={'text'} name={"diploma"} 
+              value={obj.diploma} onChange={handleChange}></MainInput>
             <div className='start-end-date'>
-              <MainInput label={'Start Date'} type={'text'}></MainInput>
-              <MainInput label={'End Date'} type={'text'}></MainInput>
+              <MainInput label={'Start Date'} type={'text'} name={"startDate"} 
+                value={obj.startDate} onChange={handleChange}></MainInput>
+              <MainInput label={'End Date'} type={'text'} name={"endDate"} 
+                value={obj.endDate} onChange={handleChange}></MainInput>
             </div>
           </div>
         )}

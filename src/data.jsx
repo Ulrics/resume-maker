@@ -1,4 +1,4 @@
-class Resume{
+export class Resume{
     constructor(){
         this.name ="";
         this.email="";
@@ -6,6 +6,11 @@ class Resume{
         this.links=[];
         this.educationList=[];
         this.experienceList=[];
+    }
+
+    addLinks(){
+        const newContact = new ContactLink();
+        this.links.push(newContact);
     }
 
     addEducation(){
@@ -17,21 +22,9 @@ class Resume{
         const newExperience = new Experience();
         this.experienceList.push(newExperience);
     }
-
-    removeEducation(id){
-        const isId = (element) => element.id === id;
-        const index = this.educationList.findIndex(isId);
-        this.educationList.splice(index, 1);
-    }
-
-    removeExperience(id){
-        const isId = (element) => element.id === id;
-        const index = this.experienceList.findIndex(isId);
-        this.experienceList.splice(index, 1);
-    }
 }
 
-class Education{
+export class Education{
     constructor(){
         this.school="";
         this.diploma="";
@@ -42,7 +35,7 @@ class Education{
     }
 }
 
-class Experience{
+export class Experience{
     constructor(){
         this.title="";
         this.company="";
@@ -55,27 +48,26 @@ class Experience{
     }
 
     addJobPoint(){
-        const newPoint = new jobPoint();
+        const newPoint = new JobPoint();
         this.jobPoints.push(newPoint);
-    }
-
-    removeJobPoint(id){
-        const isId = (element) => element.id === id;
-        const index = this.jobPoints.findIndex(isId);
-        this.jobPoints.splice(index, 1);
     }
 }
 
-class jobPoint{
+class JobPoint{
     constructor(){
         this.point="";
         this.id=crypto.randomUUID();
     }
 }
 
-const resumeApp = new Resume();
+export class ContactLink{
+    constructor(){
+        this.link="";
+        this.id=crypto.randomUUID();
+    }
+}
+
+export const resumeApp = new Resume();
 resumeApp.addEducation();
 resumeApp.addExperience();
 resumeApp.experienceList[0].addJobPoint();
-
-export default resumeApp;
