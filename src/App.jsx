@@ -1,6 +1,6 @@
-import { useState, Children } from 'react'
+import { useState } from 'react'
 import { Icon, Plus, ChevronDown, Minimize2, Trash} from 'lucide-react';
-import { Education, Experience, ContactLink, resumeApp } from './data';
+import { Education, Experience, ContactLink, JobPoint, resumeApp } from './data';
 import './App.css'
 
 export function ResumeInputs(){
@@ -57,8 +57,29 @@ export function ResumeInputs(){
         obj={ex}
         onEdit={(updated) => handleEdit(ex.id, updated, "experienceList")}
         removal={() => handleRemove(ex, "experienceList")}
+        addJobPoint={handleAddJobPoint}
+        removeJobPoint={handleRemoveJobPoint}
+        handleEdit={handleEdit}
       />
     ))
+  }
+
+  function handleAddJobPoint(experienceId) {
+    setResume(prev => ({
+      ...prev,
+      experienceList: prev.experienceList.map(ex =>
+        ex.id === experienceId ? { ...ex, jobPoints: [...ex.jobPoints, new JobPoint()] }: ex
+      )
+    }));
+  }
+
+  function handleRemoveJobPoint(experienceId, jobPointId) {
+    setResume(prev => ({
+      ...prev,
+      experienceList: prev.experienceList.map(ex =>
+        ex.id === experienceId ? { ...ex, jobPoints: ex.jobPoints.filter(jp => jp.id !== jobPointId) }: ex
+      )
+    }));
   }
 
   return (
@@ -95,11 +116,11 @@ function AddBtn({ action, info }) {
 
 function JobBtn( {action} ){
     return(<button 
-    className="secondary-add-btn"
-    onClick={action}>
-    <Plus size={24} color='#333232'></Plus>
-    Add Job Point
-  </button>
+      className="secondary-add-btn"
+      onClick={action}>
+      <Plus size={24} color='#333232'></Plus>
+      Add Job Point
+    </button>
   )
 }
 
@@ -267,7 +288,7 @@ function EducationBlock( { obj, onEdit, removal } ){
   )
 }
 
-function ExperienceBlock( { obj, onEdit, removal } ){
+function ExperienceBlock( { obj, onEdit, removal, addJobPoint, removeJobPoint } ){
   const [isMinimized, setMinimized] = useState(false);
 
   function handleMinimize(){
@@ -279,28 +300,43 @@ function ExperienceBlock( { obj, onEdit, removal } ){
     onEdit({ [name]: value });
   }
 
+  function generateJobPoints(){
+    return obj.jobPoints.map((job, index) => (
+      <TextAreaInput 
+        key={job.id} 
+        label={`Job Point ${index + 1}`} 
+        onChange={(updated) => onEdit({ jobPoints: obj.jobPoints.map(jp => 
+          jp.id === job.id ? { ...jp, ...updated } : jp
+        )})}
+        deleteAction={() => removeJobPoint(obj.id, job.id)}/>
+    ))
+  }
 
   return(
     <div className="info-block">
       <div className='card-header-container'>
         <h4>{obj.title || "New Experience"}</h4>
         <div className="block-action-container">
-          <MedIconBtn action={handleMinimize} jsxIcon={Minimize2}></MedIconBtn>
-          <MedIconBtn action={removal} jsxIcon={Trash} destructive={true}></MedIconBtn>
+          <MedIconBtn action={handleMinimize} jsxIcon={Minimize2}/>
+          <MedIconBtn action={removal} jsxIcon={Trash} destructive={true}/>
         </div>
       </div>  
         {!isMinimized && (
           <div className='input-block'>
             <MainInput label={'Job Title'} type={'text'} name={'title'} 
-              value={obj.title} onChange={handleChange}></MainInput>
-            <MainInput label={'Company Name'} type={'text'}></MainInput>
-            <MainInput label={'Location'} type={'text'}></MainInput>
+              value={obj.title} onChange={handleChange}/>
+            <MainInput label={'Company Name'} type={'text'} name={'company'} 
+              value={obj.company} onChange={handleChange}/>
+            <MainInput label={'Location'} type={'text'} name={'location'} 
+              value={obj.location} onChange={handleChange}/>
             <div className='start-end-date'>
-              <MainInput label={'Start Date'} type={'text'}></MainInput>
-              <MainInput label={'End Date'} type={'text'}></MainInput>
+              <MainInput label={'Start Date'} type={'text'} name={'startDate'} 
+              value={obj.startDate} onChange={handleChange}/>
+              <MainInput label={'End Date'} type={'text'} name={'endDate'} 
+              value={obj.endDate} onChange={handleChange}/>
             </div>
-            <TextAreaInput label={'Job Point Test'}></TextAreaInput>
-            <JobBtn action={''}></JobBtn>
+            {generateJobPoints()}
+            <JobBtn action={() => addJobPoint(obj.id)}/>
           </div>
         )}
     </div>

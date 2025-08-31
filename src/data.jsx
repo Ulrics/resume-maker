@@ -17,7 +17,6 @@ export class Resume{
         const newEducation = new Education();
         this.educationList.push(newEducation);
     }
-
     addExperience(){
         const newExperience = new Experience();
         this.experienceList.push(newExperience);
@@ -53,7 +52,7 @@ export class Experience{
     }
 }
 
-class JobPoint{
+export class JobPoint{
     constructor(){
         this.point="";
         this.id=crypto.randomUUID();
