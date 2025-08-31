@@ -127,7 +127,7 @@ h4{
 
 .info-block{
   width: 100%;
-  padding: 24px 0px;
+  padding: 16px 0px;
   display: grid;
   grid-template-columns: 1fr;
   gap: 16px;

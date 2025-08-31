@@ -1,73 +1,29 @@
 import { useState, Children } from 'react'
 import { Icon, Plus, ChevronDown, Minimize2, Trash} from 'lucide-react';
-import { Resume, Education, Experience, ContactLink, resumeApp } from './data';
+import { Education, Experience, ContactLink, resumeApp } from './data';
 import './App.css'
 
-export function App(){
+export function ResumeInputs(){
   const [resume, setResume] = useState(resumeApp);
-
-  function handleAddEducation(){
+  
+  function handleAdd(list, classObj){
     setResume(prev => ({
       ...prev, 
-      educationList: [...prev.educationList, new Education()]
-    }));
+      [list]: [...prev[list], new classObj()]
+    }))    
   }
 
-  function handleRemoveEducation(obj){
+  function handleRemove(obj, list){
     setResume(prev => ({
       ...prev, 
-      educationList: prev.educationList.filter(e => e.id !== obj.id)
+      [list]: prev[list].filter(e => e.id !== obj.id)
     }))
   }
 
-  function generateEducationBlock(){
-    return resume.educationList.map((edu) => (
-      <EducationBlock 
-        key={edu.id} 
-        obj={edu} 
-        onEdit={(updated) => handleEditEducation(edu.id, updated)} 
-        removal={() => handleRemoveEducation(edu)}/>
-    ))
-  }
-
-  function handleEditEducation(id, updated){
+  function handleEdit(id, updated, list){
     setResume(prev => ({
       ...prev, 
-      educationList: prev.educationList.map(e =>
-        e.id === id ? { ...e, ...updated } : e
-      )
-    }));
-  }
-
-  function generateExperienceBlock(){
-    return resume.experienceList.map((ex) => (
-      <ExperienceBlock
-        key={ex.id}
-        obj={ex}
-        onEdit={""}
-        removal={""}
-      />
-    ))
-  }
-
-  function handleAddLink(){
-    setResume(prev => ({
-      ...prev, 
-      links: [...prev.links, new ContactLink()]
-    }));
-  }
-
-  function handleRemoveLink(obj){
-    setResume(prev => ({
-      ...prev, 
-      links: prev.links.filter(e => e.id !== obj.id)
-    }))
-  }
-
-  function handleEditLink(id, updated){
-    setResume(prev => ({
-      ...prev, 
-      links: prev.links.map(e =>
+      [list]: prev[list].map(e =>
         e.id === id ? { ...e, ...updated } : e
       )
     }));
@@ -79,8 +35,29 @@ export function App(){
         key={link.id} 
         obj={link} 
         label={`link ${index + 1}`}
-        onEdit={(updated) => handleEditLink(link.id, updated)} 
-        deleteAction={() => handleRemoveLink(link)}/>
+        onEdit={(updated) => handleEdit(link.id, updated, "links")} 
+        deleteAction={() => handleRemove(link, "links")}/>
+    ))
+  }
+
+  function generateEducationBlock(){
+    return resume.educationList.map((edu) => (
+      <EducationBlock 
+        key={edu.id} 
+        obj={edu} 
+        onEdit={(updated) => handleEdit(edu.id, updated, "educationList")} 
+        removal={() => handleRemove(edu, "educationList")}/>
+    ))
+  }
+
+  function generateExperienceBlock(){
+    return resume.experienceList.map((ex) => (
+      <ExperienceBlock
+        key={ex.id}
+        obj={ex}
+        onEdit={(updated) => handleEdit(ex.id, updated, "experienceList")}
+        removal={() => handleRemove(ex, "experienceList")}
+      />
     ))
   }
 
@@ -90,15 +67,15 @@ export function App(){
         <PersonalDetailsBlock>
           {generateLinks()}
         </PersonalDetailsBlock> 
-        <AddBtn action={handleAddLink} info={"Links"}/>
+        <AddBtn action={() => handleAdd("links", ContactLink)} info={"Links"}/>
       </CardCollapse>
       <CardCollapse header={'Education'}>
         {generateEducationBlock()}
-        <AddBtn action={handleAddEducation} info={"Education"} resume={resume}/>
+        <AddBtn action={() => handleAdd("educationList", Education)} info={"Education"} resume={resume}/>
       </CardCollapse>
        <CardCollapse header={'Experience'}>
         {generateExperienceBlock()}
-        <AddBtn action={() => resumeApp.addExperience()} info={"Experience"}/>
+        <AddBtn action={() => handleAdd("experienceList", Experience)} info={"Experience"}/>
       </CardCollapse>
     </>
   )
@@ -196,12 +173,12 @@ function CardCollapse( {children, header} ){
   </div>)
 } 
 
-function MainInput( {label, type} ){
+function MainInput( {label, type, value, name, onChange} ){
   return(
     <div className="input-container">
       <label>
       {label}
-      <input className='input-main' type={type}></input>
+      <input className='input-main' type={type} value={value} name={name} onChange={onChange}></input>
       </label>
     </div>
   )
@@ -266,23 +243,23 @@ function EducationBlock( { obj, onEdit, removal } ){
   return(
     <div className="info-block">
       <div className='card-header-container'>
-        <h4>{obj.title || "New Education"}</h4>
+        <h4>{obj.school || "New Education"}</h4>
         <div className="block-action-container">
-          <MedIconBtn action={handleMinimize} jsxIcon={Minimize2}></MedIconBtn>
-          <MedIconBtn action={removal} jsxIcon={Trash} destructive={true}></MedIconBtn>
+          <MedIconBtn action={handleMinimize} jsxIcon={Minimize2}/>
+          <MedIconBtn action={removal} jsxIcon={Trash} destructive={true}/>
         </div>
       </div>  
         {!isMinimized && (
           <div className='input-block'>
             <MainInput label={'School Name'} type={'text'} name={"school"} 
-              value={obj.school} onChange={handleChange}></MainInput>
+              value={obj.school} onChange={handleChange}/>
             <MainInput label={'Diploma'} type={'text'} name={"diploma"} 
-              value={obj.diploma} onChange={handleChange}></MainInput>
+              value={obj.diploma} onChange={handleChange}/>
             <div className='start-end-date'>
               <MainInput label={'Start Date'} type={'text'} name={"startDate"} 
-                value={obj.startDate} onChange={handleChange}></MainInput>
+                value={obj.startDate} onChange={handleChange}/>
               <MainInput label={'End Date'} type={'text'} name={"endDate"} 
-                value={obj.endDate} onChange={handleChange}></MainInput>
+                value={obj.endDate} onChange={handleChange}/>
             </div>
           </div>
         )}
@@ -290,17 +267,23 @@ function EducationBlock( { obj, onEdit, removal } ){
   )
 }
 
-function ExperienceBlock( {removal} ){
+function ExperienceBlock( { obj, onEdit, removal } ){
   const [isMinimized, setMinimized] = useState(false);
 
   function handleMinimize(){
     setMinimized(!isMinimized);
   }
 
+  function handleChange(event){
+    const { name, value } = event.target;
+    onEdit({ [name]: value });
+  }
+
+
   return(
     <div className="info-block">
       <div className='card-header-container'>
-        <h4>Experience test</h4>
+        <h4>{obj.title || "New Experience"}</h4>
         <div className="block-action-container">
           <MedIconBtn action={handleMinimize} jsxIcon={Minimize2}></MedIconBtn>
           <MedIconBtn action={removal} jsxIcon={Trash} destructive={true}></MedIconBtn>
@@ -308,7 +291,8 @@ function ExperienceBlock( {removal} ){
       </div>  
         {!isMinimized && (
           <div className='input-block'>
-            <MainInput label={'Job Title'} type={'text'}></MainInput>
+            <MainInput label={'Job Title'} type={'text'} name={'title'} 
+              value={obj.title} onChange={handleChange}></MainInput>
             <MainInput label={'Company Name'} type={'text'}></MainInput>
             <MainInput label={'Location'} type={'text'}></MainInput>
             <div className='start-end-date'>
