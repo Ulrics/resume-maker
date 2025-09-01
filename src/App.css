@@ -14,6 +14,8 @@
 
   --hover-grey: #DDDADA;
 
+  --font-style: 'Manrope';
+
   font-family: 'Manrope';
 }
 
@@ -50,12 +52,33 @@
   gap: 8px;
 }
 
+.font-btn{
+  width: 100%;
+  color: var(--dark);
+  background-color: var(--grey);
+  border: 1px solid var(--bdr-grey);
+  border-radius: 12px;
+  font: 600 1rem/1.5rem 'Manrope';
+  padding: 8px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+}
+
+
 .primary-add-btn:hover{
   cursor: pointer;
   background-color: var(--primary-hover);
 }
 
 .secondary-add-btn:hover{
+  cursor: pointer;
+  background-color: var(--grey-hover);
+}
+
+.font-btn:hover{
   cursor: pointer;
   background-color: var(--grey-hover);
 }
@@ -282,15 +305,24 @@ label{
 }
 
 .preview-h2{
-  font: 700 2rem/3rem 'Manrope';
+  font: 700 2rem/3rem var(--font-style);
 }
 
 .preview-h3{
-  font: 700 1.25rem/1.5rem 'Manrope';
+  font: 700 1.25rem/1.5rem var(--font-style);
 }
 
 .preview-h4{
-  font: 600 1rem/1.5rem 'Manrope';
+  font: 600 1rem/1.5rem var(--font-style);
+}
+
+.preview-h5{
+  font: 600 1rem/1.5rem var(--font-style);
+}
+
+.preview-p{
+  font-family: var(--font-style);
+  font-size: 1rem;
 }
 
 p{
@@ -299,7 +331,7 @@ p{
 
 ul{
   padding-left: 24px;
-  font: 400 1rem/1.25rem 'Manrope';
+  font: 400 1rem/1.25rem var(--font-style);
   margin: 8px 0px;
 }
 
@@ -307,4 +339,16 @@ ul{
   display: flex;
   gap: 16px;
   align-items: center;
+}
+
+.serif-icon{
+  font: 700 1.25rem/1.5rem 'Times New Roman', Serif;
+}
+
+.sans-serif-icon{
+  font: 700 1.25rem/1.5rem 'Manrope', Sans-Serif;
+}
+
+.mono-icon{
+  font: 700 1.25rem/1.5rem monospace;
 }

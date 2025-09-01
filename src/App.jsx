@@ -5,6 +5,7 @@ import './App.css'
 
 export function App(){
   const [resume, setResume] = useState(resumeApp);
+  const [fontStyle, setFontStyle] = useState('Manrope')
 
   function clearResume(){
     setResume(resumeApp);
@@ -12,6 +13,21 @@ export function App(){
   
   function fillExample(){
     setResume(exampleResume);
+  }
+
+  function changeSansSerif(){
+    setFontStyle('Manrope');
+    root.style.setProperty('--font-style', fontStyle);
+  }
+
+  function changeSerif(){
+    setFontStyle('Times New Roman');
+    root.style.setProperty('--font-style', fontStyle);
+  }
+
+  function changeMono(){
+    setFontStyle('monospace');
+    root.style.setProperty('--font-style', fontStyle);
   }
 
   return(
@@ -25,6 +41,14 @@ export function App(){
           </div>
         </div>
         <ResumeInputs resume={resume} setResume={setResume}/>
+        <div className='card-collapse'>
+          <h3>Custom Styling</h3>
+          <div className='two-btn-container'>
+            <FontBtn action={changeSansSerif} copy={'Sans Serif'} styling={'sans-serif-icon'}/>
+            <FontBtn action={changeSerif} copy={'Serif'} styling={'serif-icon'}/>
+            <FontBtn action={changeMono} copy={'Monospace'} styling={'mono-icon'}/>
+          </div>
+        </div>
       </div>
       <div className='resume-preview-container'>
         <ResumePreview resume={resume}/>
@@ -42,18 +66,18 @@ function ResumePreview( {resume} ){
 
   function generateLinks(obj){
     return obj.links.map((links) => (
-      <p key={links.id}>{links.link}</p>
+      <p key={links.id} className='preview-p'>{links.link}</p>
     ))
   }
 
   return (
     <div className='resume-preview'>
       <div>
-        <h2>{resume.name}</h2>
+        <h2 className='preview-h2'>{resume.name}</h2>
         <div className='contact-links-container'>
           <h4 className='preview-h4'>Contact:</h4>
-          <p>{resume.email}</p>
-          <p>{resume.phone}</p>
+          <p className='preview-p'>{resume.email}</p>
+          <p className='preview-p'>{resume.phone}</p>
         </div>
         <div className='contact-links-container'>
           <h4 className='preview-h4'>Links:</h4>
@@ -203,6 +227,16 @@ function GeneralBtn( {action, copy, Icon} ){
       className="secondary-add-btn"
       onClick={action}>
       <Icon size={24} color='#333232'></Icon>
+      {copy}
+    </button>
+  )
+}
+
+function FontBtn( {action, copy, styling} ){
+    return(<button 
+      className="font-btn"
+      onClick={action}>
+      <p className={styling}>Aa</p>
       {copy}
     </button>
   )
@@ -474,8 +508,8 @@ function ResumeExperiencePoint( {obj} ){
         <h4 className='preview-h4'>{`${obj.startDate} - ${obj.endDate}`}</h4>
       </div>
       <div className='gap-container'>
-        <h5>{obj.company}</h5>
-        <p>{`- ${obj.location}`}</p>
+        <h5 className='preview-h5'>{obj.company}</h5>
+        <p className='preview-p'>{`- ${obj.location}`}</p>
       </div>
       <ul>
         {generateJobPoints(obj)}
