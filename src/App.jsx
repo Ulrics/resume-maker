@@ -1,38 +1,73 @@
 import { useState } from 'react'
-import { Icon, Plus, ChevronDown, Minimize2, Trash} from 'lucide-react';
-import { Education, Experience, ContactLink, JobPoint, resumeApp } from './data';
+import { Plus, ChevronDown, Minimize2, Trash, RotateCcw, NotebookText } from 'lucide-react';
+import { Education, Experience, ContactLink, JobPoint, resumeApp, exampleResume  } from './data';
 import './App.css'
 
 export function App(){
   const [resume, setResume] = useState(resumeApp);
 
+  function clearResume(){
+    setResume(resumeApp);
+  }
+  
+  function fillExample(){
+    setResume(exampleResume);
+  }
+
   return(
-    <div>
-      <div>
+    <div className='flex-container'>
+      <div className='resume-inputs-container'>
+        <div className='card-collapse'>
+          <h2>Resume Builder</h2>
+          <div className='two-btn-container'>
+            <GeneralBtn action={clearResume} copy={'Clear All'} Icon={RotateCcw}/>
+            <GeneralBtn action={fillExample} copy={'Example Resume'} Icon={NotebookText}/>
+          </div>
+        </div>
         <ResumeInputs resume={resume} setResume={setResume}/>
       </div>
-      <div>
+      <div className='resume-preview-container'>
         <ResumePreview resume={resume}/>
       </div>
     </div>
   )
-
 }
 
 function ResumePreview( {resume} ){
-  function generateExperience(obj){
-    return obj.experienceList.map((experience) => (
-      <ResumeExperiencePoint obj={experience}/>
+  function generateResume(obj, list, Component){
+    return obj[list].map((resumePoint) => (
+      <Component key={resumePoint.id} obj={resumePoint}/>
+    ))
+  }
+
+  function generateLinks(obj){
+    return obj.links.map((links) => (
+      <p key={links.id}>{links.link}</p>
     ))
   }
 
   return (
     <div className='resume-preview'>
       <div>
-        <SectionHeader header={"Experience"}/>
-        {generateExperience(resume)}
+        <h2>{resume.name}</h2>
+        <div className='contact-links-container'>
+          <h4 className='preview-h4'>Contact:</h4>
+          <p>{resume.email}</p>
+          <p>{resume.phone}</p>
+        </div>
+        <div className='contact-links-container'>
+          <h4 className='preview-h4'>Links:</h4>
+          {generateLinks(resume)}
+        </div>
       </div>
-      <SectionHeader header={"Education"}/>
+      <div>
+        <SectionHeader header={"Experience"}/>
+        {generateResume(resume, 'experienceList', ResumeExperiencePoint)}
+      </div>
+      <div>
+        <SectionHeader header={"Education"}/>
+        {generateResume(resume, 'educationList', ResumeEducationPoint)}
+      </div>
     </div>
   )
 }
@@ -114,10 +149,17 @@ function ResumeInputs( {resume, setResume} ){
     }));
   }
 
+    function handlePersonalEdit(updated) {
+    setResume(prev => ({
+      ...prev,
+      ...updated, 
+    }));
+  }
+
   return (
     <>
       <CardCollapse header={'Personal Details'}>
-        <PersonalDetailsBlock>
+        <PersonalDetailsBlock obj={resume} onEdit={(updated) => handlePersonalEdit(updated)} >
           {generateLinks()}
         </PersonalDetailsBlock> 
         <AddBtn action={() => handleAdd("links", ContactLink)} info={"Links"}/>
@@ -140,7 +182,7 @@ function AddBtn({ action, info }) {
       className="primary-add-btn"
       onClick={action}
     >
-      <Plus size={24} color='#333232' />
+      <Plus size={24} color='#095165' />
       Add {info}
     </button>
   );
@@ -152,6 +194,16 @@ function JobBtn( {action} ){
       onClick={action}>
       <Plus size={24} color='#333232'></Plus>
       Add Job Point
+    </button>
+  )
+}
+
+function GeneralBtn( {action, copy, Icon} ){
+    return(<button 
+      className="secondary-add-btn"
+      onClick={action}>
+      <Icon size={24} color='#333232'></Icon>
+      {copy}
     </button>
   )
 }
@@ -226,7 +278,7 @@ function CardCollapse( {children, header} ){
   </div>)
 } 
 
-function MainInput( {label, type, value, name, onChange} ){
+function MainInput( {label, type, placeholder, value, name, onChange} ){
   return(
     <div className="input-container">
       <label>
@@ -256,7 +308,10 @@ function DeleteInput( {label, obj, onEdit, deleteAction} ){
   )
 }
 
-function TextAreaInput( {label, deleteAction} ){
+function TextAreaInput( {label, value, onChange, deleteAction} ){
+  function handleChange(e) {
+    onChange({ point: e.target.value }); 
+  }
   return(
     <div className="input-container">
       <label>
@@ -264,18 +319,27 @@ function TextAreaInput( {label, deleteAction} ){
         {label}
         <SmallIconBtn action={deleteAction} jsxIcon={Trash} destructive={true}></SmallIconBtn>
       </div>  
-      <textarea className='input-text-area' resize='none'></textarea>
+      <textarea className='input-text-area' resize='none' value={value} onChange={(updated) => handleChange(updated)}></textarea>
       </label>
     </div>
   )
 }
 
-function PersonalDetailsBlock( {children} ){
+function PersonalDetailsBlock( {obj, onEdit, children} ){
+  
+  function handleChange(event){
+    const { name, value } = event.target;
+    onEdit({ [name]: value });
+  }
+
   return(
     <div className="info-block">
-      <MainInput label={'Name'} type={'text'}></MainInput>
-      <MainInput label={'Email'} type={'email'}></MainInput>
-      <MainInput label={'Phone Number'} type={'text'}></MainInput>
+      <MainInput label={'Name'} type={'text'} name={"name"} 
+              value={obj.name} onChange={handleChange}/>
+      <MainInput label={'Email'} type={'email'} name={"name"} 
+              value={obj.email} onChange={handleChange}/>
+      <MainInput label={'Phone Number'} type={'text'}name={"phone"} 
+              value={obj.phone} onChange={handleChange}/>
       {children}
     </div>
   )
@@ -337,6 +401,7 @@ function ExperienceBlock( { obj, onEdit, removal, addJobPoint, removeJobPoint } 
       <TextAreaInput 
         key={job.id} 
         label={`Job Point ${index + 1}`} 
+        value={job.point}
         onChange={(updated) => onEdit({ jobPoints: obj.jobPoints.map(jp => 
           jp.id === job.id ? { ...jp, ...updated } : jp
         )})}
@@ -378,8 +443,19 @@ function ExperienceBlock( { obj, onEdit, removal, addJobPoint, removeJobPoint } 
 function SectionHeader( {header} ){
   return(
     <div>
-      <h3>{header}</h3>
+      <h3 className='preview-h3'>{header}</h3>
       <div className='divider'/>
+    </div>
+  )
+}
+
+function ResumeEducationPoint( {obj} ){
+  return(
+    <div>
+      <div className='space-between-container'>
+        <h4 className='preview-h4'>{`${obj.school} - ${obj.diploma}`}</h4>
+        <h4 className='preview-h4'>{`${obj.startDate} - ${obj.endDate}`}</h4>
+      </div>
     </div>
   )
 }
@@ -387,17 +463,17 @@ function SectionHeader( {header} ){
 function ResumeExperiencePoint( {obj} ){
   function generateJobPoints(jobObj){
     return jobObj.jobPoints.map((jobPoint) => (
-      <li>{jobPoint.point}</li>
+      <li key={jobPoint.id}>{jobPoint.point}</li>
     ))
   }
 
   return(
     <div>
-      <div>
-        <h4>{obj.title}</h4>
-        <h4>{`${obj.startDate} - ${obj.endDate}`}</h4>
+      <div className='space-between-container'>
+        <h4 className='preview-h4'>{obj.title}</h4>
+        <h4 className='preview-h4'>{`${obj.startDate} - ${obj.endDate}`}</h4>
       </div>
-      <div>
+      <div className='gap-container'>
         <h5>{obj.company}</h5>
         <p>{`- ${obj.location}`}</p>
       </div>
